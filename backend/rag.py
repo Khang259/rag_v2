@@ -2,6 +2,7 @@ from langchain_ollama import ChatOllama
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
+from operator import itemgetter
 
 LLM_MODEL = "qwen2.5-coder:3b"
 
@@ -47,9 +48,9 @@ Câu hỏi của người dùng: """
 
         return (
             {
-                "context": retriever | format_docs,
-                "question": RunnablePassthrough(),
-                "chat_history": RunnablePassthrough()
+                "context": itemgetter("question") | retriever | format_docs,
+                "question": itemgetter("question"),
+                "chat_history": itemgetter("chat_history")
             }
             | self.prompt
             | self.llm

@@ -4,7 +4,7 @@ import os
 import json
 
 # Config
-API_URL = "http://192.168.1.36:8000"  # FastAPI server
+API_URL = "http://127.0.0.1:8000"  # FastAPI server
 VECTOR_DB_PATH = "./chroma_db_user_docs"
 
 # Custom CSS với color scheme và typography (Be Vietnam Pro)
@@ -94,11 +94,13 @@ if st.session_state.vector_loaded:
     # Input question
     question = st.chat_input("Hỏi gì đó về tài liệu...")
     if question:
+        # Lưu history trước khi thêm message mới
+        previous_history = st.session_state.chat_history.copy()
         st.session_state.chat_history.append({"role": "user", "content": question})
         try:
             response = requests.post(f"{API_URL}/query", json={
                 "question": question,
-                "chat_history": st.session_state.chat_history
+                "chat_history": previous_history  # Chỉ gửi history trước đó
             })
             if response.status_code == 200:
                 ai_response = response.json()["response"]
